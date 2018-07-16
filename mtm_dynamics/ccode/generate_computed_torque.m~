@@ -68,10 +68,7 @@ M_all_t = TAU_t - G_t - CF_t;
 %% Make ODE function
 
 TAU_t = simplify(TAU_t);
-Tau_collect = collect(TAU_t);
-
-%%
-[eqn,vars,Rnew] = reduceDifferentialOrder(Tau_collect == 0, [q1t q2t q3t]);
+[eqn,vars,Rnew] = reduceDifferentialOrder(TAU_t == 0, [q1t q2t q3t]);
 [Mass,F] = massMatrixForm(eqn,vars);
 
 M = simplify(Mass);
@@ -79,5 +76,5 @@ F = simplify(F);
 
 f = M\F; % generate state-space form 
 %%
-ccode(f,'File','f.c','Comments','V1.2');
+ccode(f,'File','f_c.c','Comments','V1.2');
 
