@@ -1,4 +1,5 @@
 %% Define geometric parameters of robot
+% Temporarily modified for 2 DOF planar 
 clc;clear;
 close all
 
@@ -124,38 +125,38 @@ syms Fv2 Fc2 Fo2 real;
 [delta_L2, r2, I2] = inertia_bary2std(Lxx2, Lxy2, Lxz2, Lyy2, Lyz2, Lzz2, lx2, ly2, lz2, m2);
 delta_A2 = [Fv2;];% Fc2; Fo2];
 %delta_A2 = [];
-syms Lxx3 Lxy3 Lxz3 Lyy3 Lyz3 Lzz3 lx3 ly3 lz3 m3 real;
-syms Fv3 Fc3 Fo3 real;
-[delta_L3, r3, I3] = inertia_bary2std(Lxx3, Lxy3, Lxz3, Lyy3, Lyz3, Lzz3, lx3, ly3, lz3, m3);
-delta_A3 = [Fv3;];% Fc3; Fo3];
-%delta_A3 = [];
+% syms Lxx3 Lxy3 Lxz3 Lyy3 Lyz3 Lzz3 lx3 ly3 lz3 m3 real;
+% syms Fv3 Fc3 Fo3 real;
+% [delta_L3, r3, I3] = inertia_bary2std(Lxx3, Lxy3, Lxz3, Lyy3, Lyz3, Lzz3, lx3, ly3, lz3, m3);
+% delta_A3 = [Fv3;];% Fc3; Fo3];
+% %delta_A3 = [];
 %%
 % Linear and rotational velocities of link mass centers 
 % Tranformations for mass centers
 T01_mc = simplify(T01*trans_mat(r1));
 T02_mc = simplify(T02*trans_mat(r2));
-T03_mc = simplify(T03*trans_mat(r3));
+% T03_mc = simplify(T03*trans_mat(r3));
 
 p01_mc = T01_mc(1:3,4);
 p02_mc = T02_mc(1:3,4);
-p03_mc = T03_mc(1:3,4);
+% p03_mc = T03_mc(1:3,4);
 
 syms t real;
 syms q1t(t) q2t(t) q3t(t)
 T01_mc_t = subs(T01_mc, {q1, q2, q3}, {q1t, q2t, q3t});
 T02_mc_t = subs(T02_mc, {q1, q2, q3}, {q1t, q2t, q3t});
-T03_mc_t = subs(T03_mc, {q1, q2, q3}, {q1t, q2t, q3t});
+% T03_mc_t = subs(T03_mc, {q1, q2, q3}, {q1t, q2t, q3t});
 
 dT01_mc_t = simplify(diff(T01_mc_t, t));
 dT02_mc_t = simplify(diff(T02_mc_t, t));
-dT03_mc_t = simplify(diff(T03_mc_t, t));
+% dT03_mc_t = simplify(diff(T03_mc_t, t));
 
 dT01_mc = subs(dT01_mc_t, {diff(q1t(t), t), diff(q2t(t), t), diff(q3t(t), t)}, {dq1, dq2, dq3});
 dT02_mc = subs(dT02_mc_t, {diff(q1t(t), t), diff(q2t(t), t), diff(q3t(t), t)}, {dq1, dq2, dq3});
-dT03_mc = subs(dT03_mc_t, {diff(q1t(t), t), diff(q2t(t), t), diff(q3t(t), t)}, {dq1, dq2, dq3});
+% dT03_mc = subs(dT03_mc_t, {diff(q1t(t), t), diff(q2t(t), t), diff(q3t(t), t)}, {dq1, dq2, dq3});
 dT01_mc = subs(dT01_mc, {q1t, q2t, q3t}, {q1, q2, q3});
 dT02_mc = subs(dT02_mc, {q1t, q2t, q3t}, {q1, q2, q3});
-dT03_mc = subs(dT03_mc, {q1t, q2t, q3t}, {q1, q2, q3});
+% dT03_mc = subs(dT03_mc, {q1t, q2t, q3t}, {q1, q2, q3});
 w01_mc = simplify(so3ToVec(dT01_mc(1:3, 1:3)*(T01_mc(1:3,1:3).')));
 %dR01_mc = dT01_mc(1:3, 1:3);
 v01_mc = dT01_mc(1:3, 4);
@@ -163,21 +164,21 @@ w02_mc = simplify(so3ToVec(dT02_mc(1:3, 1:3)*(T02_mc(1:3,1:3).')));
 %dR02_mc = dT02_mc(1:3, 1:3);
 v02_mc = dT02_mc(1:3, 4);
 %dR03_mc = dT03_mc(1:3, 1:3);
-w03_mc = simplify(so3ToVec(dT03_mc(1:3, 1:3)*(T03_mc(1:3,1:3).')));
-v03_mc = dT03_mc(1:3, 4);
+% w03_mc = simplify(so3ToVec(dT03_mc(1:3, 1:3)*(T03_mc(1:3,1:3).')));
+% v03_mc = dT03_mc(1:3, 4);
 
 %%
 % Kinetic energy
-Ke = 1/2*m1*(v01_mc.')*v01_mc + 1/2*m2*(v02_mc.')*v02_mc + 1/2*m3*(v03_mc.')*v03_mc;
+Ke = 1/2*m1*(v01_mc.')*v01_mc + 1/2*m2*(v02_mc.')*v02_mc; % + 1/2*m3*(v03_mc.')*v03_mc;
 Ke = Ke + 1/2*(w01_mc.')*inertia_tensor2world(T01_mc, I1)*w01_mc +...
-    1/2*(w02_mc.')*inertia_tensor2world(T02_mc, I2)*w02_mc +...
-    1/2*(w03_mc.')*inertia_tensor2world(T03_mc, I3)*w03_mc;
+    1/2*(w02_mc.')*inertia_tensor2world(T02_mc, I2)*w02_mc;% +...
+    % 1/2*(w03_mc.')*inertia_tensor2world(T03_mc, I3)*w03_mc;
 Ke = simplify(Ke);
 
 %%
 % Potential energy
 g = [0 0 -9.81];
-Pe = dot(p01_mc, -g)*m1 + dot(p02_mc, -g)*m2 + dot(p03_mc, -g)*m3;
+Pe = dot(p01_mc, -g)*m1 + dot(p02_mc, -g)*m2; % + dot(p03_mc, -g)*m3;
 Pe = simplify(Pe);
 
 %%
@@ -196,18 +197,18 @@ tau2 = subs(diff(subs(diff(L, dq2), {q1, q2, q3, dq1, dq2 ,dq3}, {q1t, q2t, q3t,
     - diff(L, q2)...
     + Fv2*dq2;% + Fc2*sign(dq2) + Fo2;
 % tau2 = simplify(tau2);
-tau3 = subs(diff(subs(diff(L, dq3), {q1, q2, q3, dq1, dq2 ,dq3}, {q1t, q2t, q3t, diff(q1t, t), diff(q2t, t), diff(q3t, t)}), t),...
-    {diff(q1t, t, 2), diff(q2t, t, 2), diff(q3t, t, 2), diff(q1t, t), diff(q2t, t), diff(q3t, t), q1t, q2t, q3t}, {ddq1, ddq2 ,ddq3, dq1, dq2 ,dq3, q1, q2, q3})...
-    - diff(L, q3)...
-    + Fv3*dq3;% + Fc3*sign(dq3) + Fo3;
+% tau3 = subs(diff(subs(diff(L, dq3), {q1, q2, q3, dq1, dq2 ,dq3}, {q1t, q2t, q3t, diff(q1t, t), diff(q2t, t), diff(q3t, t)}), t),...
+%     {diff(q1t, t, 2), diff(q2t, t, 2), diff(q3t, t, 2), diff(q1t, t), diff(q2t, t), diff(q3t, t), q1t, q2t, q3t}, {ddq1, ddq2 ,ddq3, dq1, dq2 ,dq3, q1, q2, q3})...
+%     - diff(L, q3)...
+%     + Fv3*dq3;% + Fc3*sign(dq3) + Fo3;
 % tau3 = simplify(tau3);
 
-Tau = [tau1; tau2; tau3];
+Tau = [tau1; tau2]; % tau3];
 
 %%
 % Write energy function in linear equation of inertia parameters
 %X = [delta_L1; delta_L2; delta_L3];
-X = [delta_L1; delta_A1; delta_L2; delta_A2; delta_L3; delta_A3];
+X = [delta_L1; delta_A1; delta_L2; delta_A2]; % delta_L3; delta_A3];
 % Energy
 %h = equationsToMatrix(L, X);
 % Torque
@@ -220,6 +221,7 @@ h = equationsToMatrix(Tau, X);
 rand_var_file_name = "data/rand_var.mat";
 rand_var.rand_num = length(h)+5;
 
+%%
 if 2 == exist(rand_var_file_name)
     load(rand_var_file_name)
 else
@@ -227,25 +229,32 @@ else
     rand_var.rand_num = length(h)+5;
     rand_var.q1_rand = (rand(rand_var.rand_num,1)-0.5)*6.28;
     rand_var.q2_rand = (rand(rand_var.rand_num,1)-0.5)*6.28;
-    rand_var.q3_rand = (rand(rand_var.rand_num,1)-0.5)*6.28;
+    %rand_var.q3_rand = (rand(rand_var.rand_num,1)-0.5)*6.28;
     rand_var.dq1_rand = (rand(rand_var.rand_num,1)-0.5)*6.28;
     rand_var.dq2_rand = (rand(rand_var.rand_num,1)-0.5)*6.28;
-    rand_var.dq3_rand = (rand(rand_var.rand_num,1)-0.5)*6.28;
+    %rand_var.dq3_rand = (rand(rand_var.rand_num,1)-0.5)*6.28;
     rand_var.ddq1_rand = (rand(rand_var.rand_num,1)-0.5)*6.28;
     rand_var.ddq2_rand = (rand(rand_var.rand_num,1)-0.5)*6.28;
-    rand_var.ddq3_rand = (rand(rand_var.rand_num,1)-0.5)*6.28;
+    %rand_var.ddq3_rand = (rand(rand_var.rand_num,1)-0.5)*6.28;
 
     save(rand_var_file_name, "rand_var")
 end
 
+%%
 W = [];
 for i=1:rand_var.rand_num
-    W(i*3-2:i*3,:) = subs(h, {q1, q2, q3, dq1, dq2, dq3, ddq1, ddq2, ddq3},...
-        {rand_var.q1_rand(i), rand_var.q2_rand(i), rand_var.q3_rand(i),...
-        rand_var.dq1_rand(i), rand_var.dq2_rand(i), rand_var.dq3_rand(i),...
-        rand_var.ddq1_rand(i), rand_var.ddq2_rand(i), rand_var.ddq3_rand(i)});
+%     W(i*3-2:i*3,:) = subs(h, {q1, q2, q3, dq1, dq2, dq3, ddq1, ddq2, ddq3},...
+%         {rand_var.q1_rand(i), rand_var.q2_rand(i), rand_var.q3_rand(i),...
+%         rand_var.dq1_rand(i), rand_var.dq2_rand(i), rand_var.dq3_rand(i),...
+%         rand_var.ddq1_rand(i), rand_var.ddq2_rand(i), rand_var.ddq3_rand(i)});
+
+    W(i*2-1:i*2,:) = subs(h, {q1, q2, dq1, dq2, ddq1, ddq2},...
+    {rand_var.q1_rand(i), rand_var.q2_rand(i),...
+    rand_var.dq1_rand(i), rand_var.dq2_rand(i),...
+    rand_var.ddq1_rand(i), rand_var.ddq2_rand(i)});
 end
 
+%%
 b = rank(W);
 c = length(X);
 % H*P = Q*R
@@ -295,6 +304,9 @@ if 2 == exist(tr_file_name) && regenerate_trajectory == 0
 else
     tr = optimal_exciting_traj(h_b, n_H, w_f);
     save(tr_file_name, "tr")
+    
+    
+    
 end
 
 plot_excitation_traj(tr);
@@ -307,15 +319,15 @@ q1a_file_name = "data/experiment_data/50s/outer_yaw_joint_states.csv";
 q1a_data_raw = csvread(q1a_file_name);
 q2a_file_name = "data/experiment_data/50s/shoulder_pitch_joint_states.csv";
 q2a_data_raw = csvread(q2a_file_name);
-q3a_file_name = "data/experiment_data/50s/elbow_pitch_joint_states.csv";
-q3a_data_raw = csvread(q3a_file_name);
+% q3a_file_name = "data/experiment_data/50s/elbow_pitch_joint_states.csv";
+% q3a_data_raw = csvread(q3a_file_name);
 
 q1b_file_name = "data/experiment_data/50s2/outer_yaw_joint_states.csv";
 q1b_data_raw = csvread(q1b_file_name);
 q2b_file_name = "data/experiment_data/50s2/shoulder_pitch_joint_states.csv";
 q2b_data_raw = csvread(q2b_file_name);
-q3b_file_name = "data/experiment_data/50s2/elbow_pitch_joint_states.csv";
-q3b_data_raw = csvread(q3b_file_name);
+% q3b_file_name = "data/experiment_data/50s2/elbow_pitch_joint_states.csv";
+% q3b_data_raw = csvread(q3b_file_name);
 
 %%
 % Get Acceleration by differentiation
@@ -330,11 +342,11 @@ sampling_freq = 200;
 % q1_data(:,4) = q1_data_raw(2:end-1,3);
 q1a_data = raw_data2data(q1a_data_raw, sampling_freq);
 q2a_data = raw_data2data(q2a_data_raw, sampling_freq);
-q3a_data = raw_data2data(q3a_data_raw, sampling_freq);
+% q3a_data = raw_data2data(q3a_data_raw, sampling_freq);
 
 q1b_data = raw_data2data(q1b_data_raw, sampling_freq);
 q2b_data = raw_data2data(q2b_data_raw, sampling_freq);
-q3b_data = raw_data2data(q3b_data_raw, sampling_freq);
+% q3b_data = raw_data2data(q3b_data_raw, sampling_freq);
 
 %%
 % remove abnormal acceleration data
@@ -354,34 +366,35 @@ freqz(b_f,a_f)
 % filt data a
 q1a_data_filted = filt_data(q1a_data, b_f, a_f);
 q2a_data_filted = filt_data(q2a_data, b_f, a_f);
-q3a_data_filted = filt_data(q3a_data, b_f, a_f);
+% q3a_data_filted = filt_data(q3a_data, b_f, a_f);
 
-plot_data(q1a_data, q2a_data, q3a_data, q1a_data_filted, q2a_data_filted, q3a_data_filted, sampling_freq);
+% plot_data(q1a_data, q2a_data, q3a_data, q1a_data_filted, q2a_data_filted, q3a_data_filted, sampling_freq);
+plot_data_2(q1a_data, q2a_data, q1a_data_filted, q2a_data_filted, sampling_freq);
 
 %%
 % filt data b
 q1b_data_filted = filt_data(q1b_data, b_f, a_f);
 q2b_data_filted = filt_data(q2b_data, b_f, a_f);
-q3b_data_filted = filt_data(q3b_data, b_f, a_f);
+% q3b_data_filted = filt_data(q3b_data, b_f, a_f);
 
-plot_data(q1b_data, q2b_data, q3b_data, q1b_data_filted, q2b_data_filted, q3b_data_filted, sampling_freq);
+plot_data_2(q1b_data, q2b_data, q1b_data_filted, q2b_data_filted, sampling_freq);
 
 %%
 % remove near zero velocity data and outlier
 vel_threshold = 0.00;
-[q1a_data_no_zero, q2a_data_no_zero, q3a_data_no_zero] = ...
-    remove_near_zero_vel_data(q1a_data_filted, q2a_data_filted, q3a_data_filted, vel_threshold);
+[q1a_data_no_zero, q2a_data_no_zero] = ...
+    remove_near_zero_vel_data_2(q1a_data_filted, q2a_data_filted, vel_threshold);
 
 
-[q1b_data_no_zero, q2b_data_no_zero, q3b_data_no_zero] = ...
-    remove_near_zero_vel_data(q1b_data_filted, q2b_data_filted, q3b_data_filted, vel_threshold);
+[q1b_data_no_zero, q2b_data_no_zero] = ...
+    remove_near_zero_vel_data_2(q1b_data_filted, q2b_data_filted, vel_threshold);
 % q1_data_no_zero = q1_data_filted;
 % q2_data_no_zero = q2_data_filted;
 % q3_data_no_zero = q3_data_filted;
 %%
 % Generate regression matrix
-[W_data_a, b_data_a] = generate_regression_mat(q1a_data_no_zero, q2a_data_no_zero, q3a_data_no_zero, h_b);
-[W_data_b, b_data_b] = generate_regression_mat(q1b_data_no_zero, q2b_data_no_zero, q3b_data_no_zero, h_b);
+[W_data_a, b_data_a] = generate_regression_mat_2(q1a_data_no_zero, q2a_data_no_zero, h_b);
+[W_data_b, b_data_b] = generate_regression_mat_2(q1b_data_no_zero, q2b_data_no_zero, h_b);
 %%
 % least square
 XB1_ols = W_data_a\b_data_a;
