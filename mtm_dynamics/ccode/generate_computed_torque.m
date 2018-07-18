@@ -78,6 +78,12 @@ M = simplify(Mass);
 F = simplify(F);
 
 f = M\F; % generate state-space form 
+f_collect = collect(f);
+
+%**** WARNING ************
+% DO NOT attempt to simplify f. it's gonna break your computer.
+
 %%
+% ccode(f_collect,'File','f_collect.c','Comments','V1.2');
 ccode(f,'File','f.c','Comments','V1.2');
 
