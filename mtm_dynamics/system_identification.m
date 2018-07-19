@@ -143,19 +143,19 @@ p02_mc = T02_mc(1:3,4);
 
 syms t real;
 syms q1t(t) q2t(t) q3t(t)
-T01_mc_t = subs(T01_mc, {q1, q2, q3}, {q1t, q2t, q3t});
-T02_mc_t = subs(T02_mc, {q1, q2, q3}, {q1t, q2t, q3t});
+T01_mc_t = subs(T01_mc, {q1, q2}, {q1t, q2t});
+T02_mc_t = subs(T02_mc, {q1, q2}, {q1t, q2t});
 % T03_mc_t = subs(T03_mc, {q1, q2, q3}, {q1t, q2t, q3t});
 
 dT01_mc_t = simplify(diff(T01_mc_t, t));
 dT02_mc_t = simplify(diff(T02_mc_t, t));
 % dT03_mc_t = simplify(diff(T03_mc_t, t));
 
-dT01_mc = subs(dT01_mc_t, {diff(q1t(t), t), diff(q2t(t), t), diff(q3t(t), t)}, {dq1, dq2, dq3});
-dT02_mc = subs(dT02_mc_t, {diff(q1t(t), t), diff(q2t(t), t), diff(q3t(t), t)}, {dq1, dq2, dq3});
+dT01_mc = subs(dT01_mc_t, {diff(q1t(t), t), diff(q2t(t), t)}, {dq1, dq2});
+dT02_mc = subs(dT02_mc_t, {diff(q1t(t), t), diff(q2t(t), t)}, {dq1, dq2});
 % dT03_mc = subs(dT03_mc_t, {diff(q1t(t), t), diff(q2t(t), t), diff(q3t(t), t)}, {dq1, dq2, dq3});
-dT01_mc = subs(dT01_mc, {q1t, q2t, q3t}, {q1, q2, q3});
-dT02_mc = subs(dT02_mc, {q1t, q2t, q3t}, {q1, q2, q3});
+dT01_mc = subs(dT01_mc, {q1t, q2t}, {q1, q2});
+dT02_mc = subs(dT02_mc, {q1t, q2t}, {q1, q2});
 % dT03_mc = subs(dT03_mc, {q1t, q2t, q3t}, {q1, q2, q3});
 w01_mc = simplify(so3ToVec(dT01_mc(1:3, 1:3)*(T01_mc(1:3,1:3).')));
 %dR01_mc = dT01_mc(1:3, 1:3);
@@ -187,13 +187,13 @@ L = Ke - Pe;
 
 %%
 
-tau1 = subs(diff(subs(diff(L, dq1), {q1, q2, q3, dq1, dq2 ,dq3}, {q1t, q2t, q3t, diff(q1t, t), diff(q2t, t), diff(q3t, t)}), t),...
-    {diff(q1t, t, 2), diff(q2t, t, 2), diff(q3t, t, 2), diff(q1t, t), diff(q2t, t), diff(q3t, t), q1t, q2t, q3t}, {ddq1, ddq2 ,ddq3, dq1, dq2 ,dq3, q1, q2, q3})...
+tau1 = subs(diff(subs(diff(L, dq1), {q1, q2, dq1, dq2}, {q1t, q2t, diff(q1t, t), diff(q2t, t)}), t),...
+    {diff(q1t, t, 2), diff(q2t, t, 2), diff(q1t, t), diff(q2t, t), q1t, q2t}, {ddq1, ddq2, dq1, dq2, q1, q2})...
     - diff(L, q1)...
     + Fv1*dq1;% + Fc1*sign(dq1) + Fo1;
 % tau1 = simplify(tau1);
-tau2 = subs(diff(subs(diff(L, dq2), {q1, q2, q3, dq1, dq2 ,dq3}, {q1t, q2t, q3t, diff(q1t, t), diff(q2t, t), diff(q3t, t)}), t),...
-    {diff(q1t, t, 2), diff(q2t, t, 2), diff(q3t, t, 2), diff(q1t, t), diff(q2t, t), diff(q3t, t), q1t, q2t, q3t}, {ddq1, ddq2 ,ddq3, dq1, dq2 ,dq3, q1, q2, q3})...
+tau2 = subs(diff(subs(diff(L, dq2), {q1, q2, dq1, dq2}, {q1t, q2t, diff(q1t, t), diff(q2t, t)}), t),...
+    {diff(q1t, t, 2), diff(q2t, t, 2), diff(q1t, t), diff(q2t, t), q1t, q2t}, {ddq1, ddq2, dq1, dq2, q1, q2})...
     - diff(L, q2)...
     + Fv2*dq2;% + Fc2*sign(dq2) + Fo2;
 % tau2 = simplify(tau2);
