@@ -42,10 +42,10 @@ A = h_b;
 %param = sym("param", [size(h_b,2),1]);
 param = XB1_ols;
 TAU = expand(A*param);
-G = subs(TAU, {dq1 dq2 dq3, ddq1 ddq2 ddq3}, {0, 0, 0, 0, 0, 0});
-CF = subs(TAU, {ddq1 ddq2 ddq3}, {0, 0, 0}) - G;
+G = subs(TAU, {dq1 dq2, ddq1 ddq2 }, {0, 0, 0, 0});
+CF = subs(TAU, {ddq1 ddq2}, {0, 0}) - G;
 M_all = TAU - G - CF;
-M = equationsToMatrix(M_all, {ddq1, ddq2, ddq3});
+M = equationsToMatrix(M_all, {ddq1, ddq2});
 % ccode(TAU,'File','ccode/tau.c','Comments','Version: 1.0')
 % ccode(G,'File','ccode/g.c','Comments','Version: 1.0')
 % ccode(CF,'File','ccode/cf.c','Comments','Version: 1.0')
@@ -57,12 +57,12 @@ M = equationsToMatrix(M_all, {ddq1, ddq2, ddq3});
 %%
 %A_t = subs(A, {ddq1, ddq2, ddq3, dq1, dq2, dq3, q2, q3}, {ddq1t, ddq2t, ddq3t, dq1t, dq2t, dq3t, q2t, q3t});
 
-A_t = subs(A, {ddq1, ddq2, ddq3, dq1, dq2, dq3, q2, q3}, {diff(q1t(t), t, t),...
-    diff(q2t(t), t, t), diff(q3t(t), t, t), diff(q1t(t),t), diff(q2t(t),t), diff(q3t(t),t),...
-    q2t, q3t});
+A_t = subs(A, {ddq1, ddq2, dq1, dq2, q2}, {diff(q1t(t), t, t),...
+    diff(q2t(t), t, t), diff(q1t(t),t), diff(q2t(t),t),...
+    q2t});
 TAU_t = expand(A_t*param);
-G_t = subs(TAU_t, {dq1t dq2t dq3t, ddq1t ddq2t ddq3t}, {0 0 0, 0 0 0});
-CF_t = subs(TAU_t, {ddq1t ddq2t ddq3t}, {0 0 0});
+G_t = subs(TAU_t, {dq1t dq2t, ddq1t ddq2t}, {0 0, 0 0});
+CF_t = subs(TAU_t, {ddq1t ddq2t}, {0 0});
 M_all_t = TAU_t - G_t - CF_t;
 
 %% Make ODE function
@@ -71,7 +71,7 @@ TAU_t = simplify(TAU_t);
 Tau_collect = collect(TAU_t);
 
 %%
-[eqn,vars,Rnew] = reduceDifferentialOrder(Tau_collect == 0, [q1t q2t q3t]);
+[eqn,vars,Rnew] = reduceDifferentialOrder(Tau_collect == 0, [q1t q2t]);
 [Mass,F] = massMatrixForm(eqn,vars);
 
 M = simplify(Mass);
@@ -79,11 +79,11 @@ F = simplify(F);
 
 f = M\F; % generate state-space form 
 f_collect = collect(f);
-
+f_collect = simplify(f_collect);
 %**** WARNING ************
 % DO NOT attempt to simplify f. it's gonna break your computer.
 
 %%
-% ccode(f_collect,'File','f_collect.c','Comments','V1.2');
-ccode(f,'File','f.c','Comments','V1.2');
+ccode(f_collect,'File','f_collect.c','Comments','V1.2');
+% ccode(f,'File','f.c','Comments','V1.2');
 
