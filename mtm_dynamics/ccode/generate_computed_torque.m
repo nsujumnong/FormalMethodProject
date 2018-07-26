@@ -84,6 +84,6 @@ f_collect = simplify(f_collect);
 % DO NOT attempt to simplify f. it's gonna break your computer.
 
 %%
-ccode(f_collect,'File','f_collect_2DoF.c','Comments','V1.2');
+% ccode(f_collect,'File','f_collect_2DoF.c','Comments','V1.2');
 % ccode(f,'File','f.c','Comments','V1.2');
 

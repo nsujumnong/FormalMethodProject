@@ -1,3 +1,6 @@
 This folder contains MATLAB scripts and functions for the Formal Method project
 
 Most of the codes and scripts are the modification of Radian and Yan's original codes for PSM and MTM parameter identification and dynamic model analysis
+
+The "divided by zero" error when running Flow* comes from Interval.cpp 
+try checking the code or see where the function is called for debugging.
