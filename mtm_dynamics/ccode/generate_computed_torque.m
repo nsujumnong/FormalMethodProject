@@ -1,6 +1,7 @@
 % This is a modification of Yan's code
 % combine with a snippet of ODE function generating code from Radian's
 % impedance control code
+format shortEng
 
 syms q1 q2 q3 q4 q5 q6 q7 real;
 syms dq1 dq2 dq3 dq4 dq5 dq6 dq7 real;
@@ -9,8 +10,8 @@ syms ddq1 ddq2 ddq3 ddq4 ddq5 ddq6 ddq7 real;
 %%
 syms t real;
 syms q1t(t) q2t(t) q3t(t) q4t(t) q5t(t) q6t(t) q7t(t);
-syms dq1t(t) dq2t(t) dq3t(t) dq4t(t) dq5t(t) dq6t(t) dq7t(t);
-syms ddq1t(t) ddq2t(t) ddq3t(t) ddq4t(t) ddq5t(t) ddq6t(t) ddq7t(t);
+% syms dq1t(t) dq2t(t) dq3t(t) dq4t(t) dq5t(t) dq6t(t) dq7t(t);
+% syms ddq1t(t) ddq2t(t) ddq3t(t) ddq4t(t) ddq5t(t) ddq6t(t) ddq7t(t);
 %%
 
 % dq1t = diff(q1t,t);
@@ -67,11 +68,35 @@ M_all_t = TAU_t - G_t - CF_t;
 
 %% Make ODE function
 
+dq1t = diff(q1t,t);
+dq2t = diff(q2t,t);
+ddq1t = diff(q1t,t,t);
+ddq2t = diff(q2t,t,t);
+
+qt = [q1t; q2t];
+dqt = [dq1t; dq2t];
+
 TAU_t = simplify(TAU_t);
+
 Tau_collect = collect(TAU_t);
 
+%% controller
+% desired q and dq
+des_q = [0; 0];
+des_dq = [0; 0];
+
+kp = 1;
+kp = kp*eye(2);
+kp = kp*(des_q - qt);
+
+kd = 1;
+kd = kd*eye(2);
+kd = kd*(des_dq - dqt);
+
+u = kp + kd;
+
 %%
-[eqn,vars,Rnew] = reduceDifferentialOrder(Tau_collect == 0, [q1t q2t]);
+[eqn,vars,Rnew] = reduceDifferentialOrder(Tau_collect - u == 0, [q1t q2t]);
 [Mass,F] = massMatrixForm(eqn,vars);
 
 M = simplify(Mass);
@@ -80,10 +105,12 @@ F = simplify(F);
 f = M\F; % generate state-space form 
 f_collect = collect(f);
 f_collect = simplify(f_collect);
-%**** WARNING ************
-% DO NOT attempt to simplify f. it's gonna break your computer.
 
 %%
 % ccode(f_collect,'File','f_collect_2DoF.c','Comments','V1.2');
 % ccode(f,'File','f.c','Comments','V1.2');
+% initCond = [0 0 0 0];
+% 
+% odefun = odeFunction(f_collect,vars);
+% ode15s(odefun, [0 10], initCond)
 
