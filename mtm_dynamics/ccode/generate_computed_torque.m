@@ -2,7 +2,11 @@
 % combine with a snippet of ODE function generating code from Radian's
 % impedance control code
 format shortEng
+clear
+clc
+close all
 
+load('data_2DoF.mat')
 syms q1 q2 q3 q4 q5 q6 q7 real;
 syms dq1 dq2 dq3 dq4 dq5 dq6 dq7 real;
 syms ddq1 ddq2 ddq3 ddq4 ddq5 ddq6 ddq7 real;
@@ -79,17 +83,20 @@ dqt = [dq1t; dq2t];
 TAU_t = simplify(TAU_t);
 
 Tau_collect = collect(TAU_t);
+mu_val = 2;
+friction = mu_val*sign(dqt);
+Tau_collect = Tau_collect + friction;
 
 %% controller
 % desired q and dq
 des_q = [0; 0];
 des_dq = [0; 0];
 
-kp = 1;
+kp = 2;
 kp = kp*eye(2);
 kp = kp*(des_q - qt);
 
-kd = 1;
+kd = 2;
 kd = kd*eye(2);
 kd = kd*(des_dq - dqt);
 
@@ -109,8 +116,11 @@ f_collect = simplify(f_collect);
 %%
 % ccode(f_collect,'File','f_collect_2DoF.c','Comments','V1.2');
 % ccode(f,'File','f.c','Comments','V1.2');
-% initCond = [0 0 0 0];
-% 
-% odefun = odeFunction(f_collect,vars);
-% ode15s(odefun, [0 10], initCond)
+
+initCond = [0 0 0 0];
+
+odefun = odeFunction(f_collect,vars);
+ode15s(odefun, [0 10], initCond)
+xlabel('time (t)')
+legend('q1','q2','dq1','dq2')
 
