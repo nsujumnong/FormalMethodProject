@@ -84,8 +84,8 @@ TAU_t = simplify(TAU_t);
 
 Tau_collect = collect(TAU_t);
 mu_val = 2;
-friction = mu_val*sign(dqt);
-Tau_collect = Tau_collect + friction;
+%friction = mu_val*sign(dqt);
+%Tau_collect = Tau_collect + friction;
 
 %% controller
 % desired q and dq
