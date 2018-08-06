@@ -5,10 +5,11 @@ clc
 
 
 syms t real;
-syms Ii(t) G(t);
+% syms Ii(t) G(t);
+syms Ii G;
 
-dIi = diff(Ii,t);
-dG = diff(G,t);
+% dIi = diff(Ii,t);
+% dG = diff(G,t);
 
 k2 = 4e5;
 k5 = 0.6;
@@ -30,37 +31,46 @@ k4 = 1;
 k8 = 0.03;
 eta = 0.005;
 
-% for Ii = 1:0.2:2
-%     j1 = uint8(Ii/0.2-4);
-%     for G = 25:0.2:26
-%         j2 = uint8(G/0.2 - 124);
-%         
-%         dIi(j1,j2) = -2 * k3 * Ii^2 * ( k8 * Ri * G^2 + tau ) /( k3 * Ii^2 + mu ) + 2* k_3 * F1 + ...
-%             ((k5 * Ie - ( k9 + k_5 ) * Ii ) * k_2 * chi * k4 * eta *( k3 * Ii^2 + mu ) ) /...
-%             ( k7 *( k2 *( k8 * Ri * G^2 + tau ) + k_2 *( k3 * Ii^2 + mu ) ) );
-% 
-%         dG(j1,j2) = -2* k8 * Ri * G^2 + (2* k_8 *( k8 * Ri * G^2 + tau ) ) /( k3 * Ii^2 + mu ) + ...
-%             ( k9 * Ii * k_2 * chi * k4 * eta *( k3 * Ii^2 + mu ) ) / ...
-%             ( k7 *( k2 *( k8 * Ri * G^2 + tau ) + k_2 *( k3 * Ii^2 + mu ) ) );
-% 
-%     end
-% end
+for Ii = 1:0.2:2
+    j1 = uint8(Ii/0.2-4);
+    for G = 25:0.2:26
+        j2 = uint8(G/0.2 - 124);
+        
+        dIi(j1,j2) = -2 * k3 * Ii^2 * ( k8 * Ri * G^2 + tau ) /( k3 * Ii^2 + mu ) + 2* k_3 * F1 + ...
+            ((k5 * Ie - ( k9 + k_5 ) * Ii ) * k_2 * chi * k4 * eta *( k3 * Ii^2 + mu ) ) /...
+            ( k7 *( k2 *( k8 * Ri * G^2 + tau ) + k_2 *( k3 * Ii^2 + mu ) ) );
+        num1(j1,j2) = 2 * k3 * Ii^2 * ( k8 * Ri * G^2 + tau );
+        den1(j1,j2) = ( k3 * Ii^2 + mu );
+        num2(j1,j2) = ((k5 * Ie - ( k9 + k_5 ) * Ii ) * k_2 * chi * k4 * eta *( k3 * Ii^2 + mu ) );
+        den2(j1,j2) = ( k7 *( k2 *( k8 * Ri * G^2 + tau ) + k_2 *( k3 * Ii^2 + mu ) ) );
+        
+
+        dG(j1,j2) = -2* k8 * Ri * G^2 + (2* k_8 *( k8 * Ri * G^2 + tau ) ) /( k3 * Ii^2 + mu ) + ...
+            ( k9 * Ii * k_2 * chi * k4 * eta *( k3 * Ii^2 + mu ) ) / ...
+            ( k7 *( k2 *( k8 * Ri * G^2 + tau ) + k_2 *( k3 * Ii^2 + mu ) ) );
+        num3(j1,j2) = (2* k_8 *( k8 * Ri * G^2 + tau ) );
+        den3(j1,j2) = ( k3 * Ii^2 + mu );
+        num4(j1,j2) = ( k9 * Ii * k_2 * chi * k4 * eta *( k3 * Ii^2 + mu ) );
+        den4(j1,j2) = ( k7 *( k2 *( k8 * Ri * G^2 + tau ) + k_2 *( k3 * Ii^2 + mu ) ) );
+
+    end
+end
 
 %%
 
-f(1) = -2 * k3 * Ii^2 * ( k8 * Ri * G^2 + tau ) /( k3 * Ii^2 + mu ) + 2* k_3 * F1 + ...
-    ((k5 * Ie - ( k9 + k_5 ) * Ii ) * k_2 * chi * k4 * eta *( k3 * Ii^2 + mu ) ) /...
-    ( k7 *( k2 *( k8 * Ri * G^2 + tau ) + k_2 *( k3 * Ii^2 + mu ) ) );
-
-f(2) = -2* k8 * Ri * G^2 + (2* k_8 *( k8 * Ri * G^2 + tau ) ) /( k3 * Ii^2 + mu ) + ...
-    ( k9 * Ii * k_2 * chi * k4 * eta *( k3 * Ii^2 + mu ) ) / ...
-    ( k7 *( k2 *( k8 * Ri * G^2 + tau ) + k_2 *( k3 * Ii^2 + mu ) ) );
+% f(1) = -2 * k3 * Ii^2 * ( k8 * Ri * G^2 + tau ) /( k3 * Ii^2 + mu ) + 2* k_3 * F1 + ...
+%     ((k5 * Ie - ( k9 + k_5 ) * Ii ) * k_2 * chi * k4 * eta *( k3 * Ii^2 + mu ) ) /...
+%     ( k7 *( k2 *( k8 * Ri * G^2 + tau ) + k_2 *( k3 * Ii^2 + mu ) ) );
+% 
+% f(2) = -2* k8 * Ri * G^2 + (2* k_8 *( k8 * Ri * G^2 + tau ) ) /( k3 * Ii^2 + mu ) + ...
+%     ( k9 * Ii * k_2 * chi * k4 * eta *( k3 * Ii^2 + mu ) ) / ...
+%     ( k7 *( k2 *( k8 * Ri * G^2 + tau ) + k_2 *( k3 * Ii^2 + mu ) ) );
 
 %%
-vars = [Ii, G];
-
-odefun = odeFunction(f,vars);
-
-initCond = [1,25];
-
-ode15s(odefun, [0 500], initCond)
+% vars = [Ii, G];
+% 
+% odefun = odeFunction(f,vars);
+% 
+% initCond = [1,25];
+% 
+% ode15s(odefun, [0 500], initCond)
